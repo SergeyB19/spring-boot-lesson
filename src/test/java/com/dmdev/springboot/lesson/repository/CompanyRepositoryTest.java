@@ -1,5 +1,6 @@
 package com.dmdev.springboot.lesson.repository;
 
+import com.dmdev.springboot.lesson.IntegrationTestBase;
 import com.dmdev.springboot.lesson.entity.CompanyEntity;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
@@ -13,10 +14,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
-class CompanyRepositoryTest {
+
+class CompanyRepositoryTest extends IntegrationTestBase {
     @Autowired
     private CompanyRepository companyRepository;
 
