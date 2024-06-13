@@ -1,15 +1,19 @@
 package com.dmdev.springboot.lesson.repository;
 
 import com.dmdev.springboot.lesson.IntegrationTestBase;
+import com.dmdev.springboot.lesson.dto.EmployeeFilter;
 import com.dmdev.springboot.lesson.entity.EmployeeEntity;
 
 import com.dmdev.springboot.lesson.projection.EmployeeNameView;
 import com.dmdev.springboot.lesson.projection.EmployeeNativeView;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.hamcrest.collection.IsCollectionWithSize;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +61,24 @@ class EmployeeRepositoryTest extends IntegrationTestBase {
 
     @Test
     void testFindCustomQuery() {
-        List<EmployeeEntity> customQuery = employeeRepository.findCustomQuery();
+        EmployeeFilter filter = EmployeeFilter.builder()
+                .firstName("ivaN")
+                .build();
+        if (filter.getFirstName() != null) {
+
+        }
+        if (filter.getLastName() != null) {
+
+        }
+        List<EmployeeEntity> customQuery = employeeRepository.findByFilter(filter);
         assertThat(customQuery, hasSize(0));
+    }
+
+    @Test
+    void testQueryDslPredicates() {
+        BooleanExpression predicate = QEmployeeEntity.employeeEntity.firstName.containsIgnoreCase("ivaN")
+                .and(QEmployeeEntity.employeeEntity.salary.goe(1000));
+        Page<EmployeeEntity> allValues = employeeRepository.findAll(predicate, Pageable.unpaged());
+        assertThat(allValues.getContent(), hasSize(1));
     }
 }
