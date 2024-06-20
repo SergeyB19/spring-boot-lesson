@@ -6,6 +6,7 @@ import com.dmdev.springboot.lesson.entity.EmployeeEntity;
 
 import com.dmdev.springboot.lesson.projection.EmployeeNameView;
 import com.dmdev.springboot.lesson.projection.EmployeeNativeView;
+import com.dmdev.springboot.lesson.util.QPredicates;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.hamcrest.collection.IsCollectionWithSize;
 
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -64,12 +66,6 @@ class EmployeeRepositoryTest extends IntegrationTestBase {
         EmployeeFilter filter = EmployeeFilter.builder()
                 .firstName("ivaN")
                 .build();
-        if (filter.getFirstName() != null) {
-
-        }
-        if (filter.getLastName() != null) {
-
-        }
         List<EmployeeEntity> customQuery = employeeRepository.findByFilter(filter);
         assertThat(customQuery, hasSize(0));
     }
@@ -80,5 +76,21 @@ class EmployeeRepositoryTest extends IntegrationTestBase {
                 .and(QEmployeeEntity.employeeEntity.salary.goe(1000));
         Page<EmployeeEntity> allValues = employeeRepository.findAll(predicate, Pageable.unpaged());
         assertThat(allValues.getContent(), hasSize(1));
+    }
+
+    @Test
+    void testQPredicates() {
+        EmployeeFilter filter = EmployeeFilter.builder()
+                .firstName("ivaN")
+                .salary(1000)
+                .build();
+        Predicate predicate = QPredicates.builder()
+                .add(filter.getFirstName(), employeeEntity.firstName::containsIgnoreCase)
+                .add(filter.getLastName(), employeeEntity.firstName::containsIgnoreCase)
+                .add(filter.getSalary(), employeeEntity.saalry::goe)
+                .buildAnd();
+        Iterable<EmployeeEntity> result = employeeRepository.findAll(predicate);
+        assertTrue(result.iterator().hasNext());
+        System.out.println();
     }
 }
